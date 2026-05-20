@@ -1,4 +1,5 @@
 const axios = require('axios');
+const crypto = require('crypto');
 const config = require('../config');
 const { getAccessToken } = require('./satusehatAuthService');
 const { handleSatusehatError } = require('../utils/satusehatError');
@@ -17,9 +18,27 @@ const createEncounter = async ({
   const orgId = config.satusehat.orgId;
   const startTimestamp = new Date().toISOString();
 
+  // ID unik encounter — wajib per SATUSEHAT RuleNumber: 10117
+  const encounterId = crypto.randomUUID();
+
   const payload = {
     resourceType: 'Encounter',
+    identifier: [
+      {
+        system: `http://sys-ids.kemkes.go.id/encounter/${orgId}`,
+        value: encounterId,
+      },
+    ],
     status: 'arrived',
+    // Riwayat status — wajib per SATUSEHAT RuleNumber: 10122
+    statusHistory: [
+      {
+        status: 'arrived',
+        period: {
+          start: startTimestamp,
+        },
+      },
+    ],
     class: {
       system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
       code: 'AMB',
@@ -63,8 +82,6 @@ const createEncounter = async ({
       reference: `Organization/${orgId}`,
     },
   };
-
-  console.log('[Encounter] POST payload:', JSON.stringify(payload, null, 2));
 
   let response;
   try {
