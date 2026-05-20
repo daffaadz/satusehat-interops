@@ -1,14 +1,10 @@
 const axios = require('axios');
 const config = require('../config');
 const { getAccessToken } = require('./satusehatAuthService');
+const { handleSatusehatError } = require('../utils/satusehatError');
 
 const FHIR_BASE = `${config.satusehat.baseUrl}/fhir-r4/v1`;
 
-/**
- * Membuat resource Location FHIR di SATUSEHAT.
- * @param {string} locationName - Nama ruangan/lokasi
- * @returns {{ locationId: string, locationName: string }}
- */
 const createLocation = async (locationName = 'Ruang Poli Umum') => {
   const token = await getAccessToken();
   const orgId = config.satusehat.orgId;
@@ -33,6 +29,8 @@ const createLocation = async (locationName = 'Ruang Poli Umum') => {
     },
   };
 
+  console.log('[Location] POST payload:', JSON.stringify(payload, null, 2));
+
   let response;
   try {
     response = await axios.post(`${FHIR_BASE}/Location`, payload, {
@@ -42,16 +40,11 @@ const createLocation = async (locationName = 'Ruang Poli Umum') => {
       },
     });
   } catch (err) {
-    if (err.response?.status === 401) {
-      const authErr = new Error('Token SATUSEHAT tidak valid atau telah kadaluarsa');
-      authErr.statusCode = 401;
-      throw authErr;
-    }
-    throw err;
+    console.error('[Location] Error response:', JSON.stringify(err.response?.data, null, 2));
+    throw handleSatusehatError(err, 'Location');
   }
 
-  const locationId = response.data.id;
-  return { locationId, locationName };
+  return { locationId: response.data.id, locationName };
 };
 
 module.exports = { createLocation };
