@@ -21,11 +21,9 @@ const registerPatient = async ({
   practitionerNik = DUMMY_PRACTITIONER_NIK,
   locationName = 'Ruang Poli Umum',
 } = {}) => {
-  // Langkah 2: Cari IHS Pasien dan IHS Dokter secara paralel
-  const [patientData, practitionerData] = await Promise.all([
-    getPatientByNik(patientNik),
-    getPractitionerByNik(practitionerNik),
-  ]);
+  // Langkah 2: Cari IHS Pasien dan IHS Dokter secara berurutan (sekuensial) untuk mencegah 429 Too Many Requests
+  const patientData = await getPatientByNik(patientNik);
+  const practitionerData = await getPractitionerByNik(practitionerNik);
 
   // Langkah 3: Buat Location
   const locationData = await createLocation(locationName);

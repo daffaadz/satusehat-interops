@@ -100,7 +100,7 @@ Frontend menyediakan antarmuka pengguna sistem.
 
 ## 📖 Dokumentasi API Backend
 
-Backend menggunakan modul `swagger-ui-express` dan `swagger-jsdoc` untuk memunculkan spesifikasi endpoint secara interaktif. Saat server berjalan, Anda dapat mengakses dokumentasi API melalui endpoint yang telah ditentukan (secara default di dokumentasi ini asumsikan di `/api-docs` atau yang telah dikonfigurasi).
+Backend menggunakan modul `swagger-ui-express` dan `swagger-jsdoc` untuk memunculkan spesifikasi endpoint secara interaktif. Saat server berjalan, Anda dapat mengakses dokumentasi API melalui endpoint yang telah ditentukan (secara default di dokumentasi ini asumsikan di `/api/docs` atau yang telah dikonfigurasi).
 
 ## 🔒 Panduan dan Standar Pengembangan
 Setiap direktori (`client` dan `server`) memiliki file `AGENTS.md` yang memuat konvensi, arsitektur, dan panduan kode (seperti struktur *folder*, pola desain *Controller-Service-Route* untuk Express, dan pembaruan framework untuk Next.js). Sangat disarankan untuk membacanya sebelum berkontribusi.
