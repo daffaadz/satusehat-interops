@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useLayoutEffect, useState } from 'react';
 import {
   applyThemeToDocument,
   getThemeColors,
@@ -10,23 +10,29 @@ import {
 
 const ThemeContext = createContext(null);
 
+function readIsDarkFromDom() {
+  if (typeof document === 'undefined') return false;
+  return document.documentElement.dataset.theme === 'dark';
+}
+
 export function ThemeProvider({ children }) {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => readIsDarkFromDom());
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const initialDark = resolveIsDark();
     setIsDark(initialDark);
     applyThemeToDocument(initialDark);
     setReady(true);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!ready) return;
     applyThemeToDocument(isDark);
   }, [isDark, ready]);
 
   const toggleTheme = useCallback(() => {
+    document.documentElement.classList.add('theme-transition-enabled');
     setIsDark((prev) => {
       const next = !prev;
       persistTheme(next);
@@ -38,7 +44,12 @@ export function ThemeProvider({ children }) {
 
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme, colors, ready }}>
-      {children}
+      <div
+        className={`min-h-full ${ready ? 'opacity-100' : 'opacity-0'}`}
+        style={{ transition: ready ? 'opacity 0.15s ease-out' : 'none' }}
+      >
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 }

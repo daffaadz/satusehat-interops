@@ -21,9 +21,18 @@ const themeInitScript = `
 (function () {
   try {
     var stored = localStorage.getItem('theme');
-    document.documentElement.dataset.theme = stored === 'dark' ? 'dark' : 'light';
+    var dark = stored === 'dark';
+    var bg = dark ? '#1a1f1d' : '#f6f4ee';
+    var fg = dark ? '#e8e6e0' : '#22332f';
+    var root = document.documentElement;
+    root.dataset.theme = dark ? 'dark' : 'light';
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    root.style.backgroundColor = bg;
+    document.body.style.backgroundColor = bg;
+    document.body.style.color = fg;
   } catch (e) {
     document.documentElement.dataset.theme = 'light';
+    document.documentElement.style.colorScheme = 'light';
   }
 })();
 `;

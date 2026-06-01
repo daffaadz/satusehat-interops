@@ -1,110 +1,90 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
+import AuthGuard from '../../components/AuthGuard';
 import Sidebar from '../../components/Sidebar';
-import Button from '../../components/Button';
+import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const { colors } = useTheme();
-
+function StatCard({ label, value, colors }) {
   return (
     <div
-      className="min-h-screen flex"
-      style={{ backgroundColor: colors.background, color: colors.foreground }}
+      className="rounded-2xl border p-5 sm:p-6"
+      style={{
+        backgroundColor: colors.cardBg,
+        borderColor: `${colors.accent}55`,
+      }}
     >
-      <Sidebar onLogout={() => router.push('/login')} />
+      <p className="text-xs font-medium uppercase tracking-[0.15em]" style={{ color: colors.accent }}>
+        {label}
+      </p>
+      <p className="mt-2 text-2xl font-semibold sm:text-3xl" style={{ color: colors.primary }}>
+        {value}
+      </p>
+    </div>
+  );
+}
 
-      <main className="flex-1 p-10">
-        <div
-          className="rounded-[32px] border p-8 shadow-2xl backdrop-blur-xl"
-          style={{
-            backgroundColor: colors.cardBg,
-            borderColor: colors.accent,
-            borderWidth: '2px',
-          }}
+function DashboardContent() {
+  const router = useRouter();
+  const { colors } = useTheme();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
+
+  const displayName = user?.name || 'Admin Klinik Percobaan';
+  const displayRole = user?.role || 'admin';
+
+  return (
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar userName={user?.username || 'admin'} onLogout={handleLogout} />
+
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+        <header
+          className="sticky top-0 z-20 border-b border-accent/30 bg-background px-6 py-5 lg:px-10"
         >
-          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p
-                className="text-sm uppercase tracking-[0.3em]"
-                style={{ color: colors.accent }}
-              >
-                Dashboard Admin
-              </p>
-              <h1 className="mt-3 text-4xl font-semibold" style={{ color: colors.primary }}>
-                Halo, Admin Klinik Percobaan
-              </h1>
-            </div>
-            <Button variant="secondary" onClick={() => router.push('/login')}>
-              Logout
-            </Button>
-          </div>
+          <p className="text-xs font-medium uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
+            Dashboard Admin
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl lg:text-4xl" style={{ color: colors.primary }}>
+            Halo, {displayName}
+          </h1>
+        </header>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div
-              className="rounded-[28px] p-6 shadow-lg"
-              style={{
-                backgroundColor: `${colors.primary}20`,
-                borderLeft: `4px solid ${colors.primary}`,
-              }}
-            >
-              <p
-                className="text-sm"
-                style={{ color: colors.accent }}
-              >
-                Status Sistem
-              </p>
-              <p
-                className="mt-3 text-2xl font-semibold"
-                style={{ color: colors.primary }}
-              >
-                Aktif
-              </p>
-            </div>
-            <div
-              className="rounded-[28px] p-6 shadow-lg"
-              style={{
-                backgroundColor: `${colors.primary}20`,
-                borderLeft: `4px solid ${colors.primary}`,
-              }}
-            >
-              <p
-                className="text-sm"
-                style={{ color: colors.accent }}
-              >
-                Pengguna Terkini
-              </p>
-              <p
-                className="mt-3 text-2xl font-semibold"
-                style={{ color: colors.primary }}
-              >
-                Admin
-              </p>
-            </div>
+        <main className="flex-1 px-6 py-6 lg:px-10 lg:py-8">
+          <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
+            <StatCard label="Status Sistem" value="Aktif" colors={colors} />
+            <StatCard label="Pengguna Terkini" value={displayRole} colors={colors} />
           </div>
 
           <section
-            className="mt-10 rounded-[28px] p-6 shadow-lg"
+            className="mt-6 rounded-2xl border p-6 lg:mt-8 lg:p-8"
             style={{
-              backgroundColor: `${colors.primary}20`,
-              borderLeft: `4px solid ${colors.primary}`,
+              backgroundColor: colors.cardBg,
+              borderColor: `${colors.accent}55`,
             }}
           >
-            <h2 className="text-2xl font-semibold" style={{ color: colors.primary }}>
+            <h2 className="text-xl font-semibold sm:text-2xl" style={{ color: colors.primary }}>
               Ringkasan Klinik
             </h2>
-            <p
-              className="mt-3 leading-7"
-              style={{ color: colors.foreground }}
-            >
+            <p className="mt-3 max-w-3xl text-sm leading-7 sm:text-base" style={{ color: colors.foreground }}>
               Halaman dashboard ini adalah template awal untuk menampung fitur-fitur interoperabilitas.
               Nanti kita tambahkan daftar pasien, jadwal konsultasi, dan pengelolaan encounter.
             </p>
           </section>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <AuthGuard>
+      <DashboardContent />
+    </AuthGuard>
   );
 }

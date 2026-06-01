@@ -9,9 +9,12 @@
   --background: #f6f4ee;
   --foreground: #22332f;
   --card-bg: rgba(242, 234, 218, 0.5);
+  --skeleton-base: #e8e2d6;
+  --skeleton-shine: #f6f4ee;
+  color-scheme: light;
 }
 
-/* Teal Warmth — dark (comfortable contrast, not pure black) */
+/* Teal Warmth — dark */
 [data-theme="dark"] {
   --primary: #5db89f;
   --secondary: #2a3a36;
@@ -19,6 +22,9 @@
   --background: #1a1f1d;
   --foreground: #e8e6e0;
   --card-bg: rgba(42, 58, 54, 0.7);
+  --skeleton-base: #24302c;
+  --skeleton-shine: #2f403b;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -31,9 +37,104 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hanya animasi saat user toggle tema, bukan saat first paint / refresh */
+html.theme-transition-enabled,
+html.theme-transition-enabled body {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 0%,
+    var(--skeleton-shine) 50%,
+    var(--skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+/* Popup: zoom + fade — hanya opacity & transform (GPU-friendly, tanpa blur) */
+@keyframes popup-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popup-overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes popup-panel-in {
+  from {
+    opacity: 0;
+    transform: scale3d(0.94, 0.94, 1);
+  }
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes popup-panel-out {
+  from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  to {
+    opacity: 0;
+    transform: scale3d(0.96, 0.96, 1);
+  }
+}
+
+.popup-overlay-in {
+  animation: popup-overlay-in 0.2s ease-out forwards;
+}
+
+.popup-overlay-out {
+  animation: popup-overlay-out 0.18s ease-in forwards;
+}
+
+.popup-panel-in,
+.popup-panel-out {
+  transform-origin: center center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.popup-panel-in {
+  animation: popup-panel-in 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.popup-panel-out {
+  animation: popup-panel-out 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
 }

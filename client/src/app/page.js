@@ -2,20 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import Button from '../components/Button';
+import HomeSkeleton from '../components/skeletons/HomeSkeleton';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Home() {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { colors, ready } = useTheme();
+
+  if (!ready) {
+    return <HomeSkeleton />;
+  }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-6"
-      style={{
-        backgroundColor: colors.background,
-        color: colors.foreground,
-      }}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div
         className="w-full max-w-3xl rounded-[40px] border p-10 shadow-2xl backdrop-blur-xl"
         style={{
@@ -38,17 +37,11 @@ export default function Home() {
             <p className="text-sm uppercase tracking-[0.4em]" style={{ color: colors.accent }}>
               Klinik Percobaan
             </p>
-            <h1
-              className="mt-4 text-5xl font-semibold"
-              style={{ color: colors.primary }}
-            >
+            <h1 className="mt-4 text-5xl font-semibold" style={{ color: colors.primary }}>
               Selamat datang di Klinik Percobaan
             </h1>
           </div>
-          <p
-            className="max-w-2xl text-sm leading-7"
-            style={{ color: colors.foreground }}
-          >
+          <p className="max-w-2xl text-sm leading-7" style={{ color: colors.foreground }}>
             Aplikasi interoperabilitas SATUSEHAT. Tekan tombol di bawah untuk masuk dan mulai menggunakan dashboard admin.
           </p>
           <Button onClick={() => router.push('/login')}>

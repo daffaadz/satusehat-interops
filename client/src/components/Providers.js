@@ -1,15 +1,16 @@
 "use client";
 
+import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
-import ThemeInit from './ThemeInit';
 import ThemeToggle from './ThemeToggle';
 
 export default function Providers({ children }) {
   return (
     <ThemeProvider>
-      <ThemeInit />
-      <ThemeToggle />
-      {children}
+      <AuthProvider>
+        <ThemeToggle />
+        {children}
+      </AuthProvider>
     </ThemeProvider>
   );
 }
