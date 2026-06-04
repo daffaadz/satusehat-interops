@@ -9,25 +9,27 @@ import { useTheme } from '../../../context/ThemeContext';
 import { api } from '../../../lib/api';
 
 function AddLocationModal({ onClose, onSuccess, colors, isDark }) {
-  const [form, setForm] = useState({ name: '', status: 'active', description: '', identifierValue: '' });
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleChange = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) { setError('Nama lokasi tidak boleh kosong.'); return; }
+    if (!name.trim()) { setError('Nama lokasi tidak boleh kosong.'); return; }
     setLoading(true);
     setError(null);
     try {
-      await api.post('/v1/satusehat/location', {
-        name: form.name.trim(),
-        status: form.status,
-        description: form.description.trim() || form.name.trim(),
-        identifierValue: form.identifierValue.trim() || undefined,
+      const result = await api.post('/v1/satusehat/location', {
+        name: name.trim(),
+        description: name.trim(),
       });
-      onSuccess();
+      const newLocationId = result?.data?.data?.locationId;
+      onSuccess({
+        id: newLocationId || `temp-${Date.now()}`,
+        name: name.trim(),
+        status: 'active',
+        identifier: [],
+      });
     } catch (err) {
       setError(err?.payload?.message || err?.message || 'Gagal menambahkan lokasi.');
     } finally {
@@ -35,29 +37,21 @@ function AddLocationModal({ onClose, onSuccess, colors, isDark }) {
     }
   };
 
-  const inputStyle = {
-    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
-    borderColor: `${colors.accent}55`,
-    color: colors.foreground,
-    outline: 'none',
-  };
-
-  const labelStyle = { color: colors.accent, fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em' };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div
-        className="w-full max-w-md rounded-2xl shadow-2xl border p-6 flex flex-col gap-5"
+        className="w-full max-w-sm rounded-2xl shadow-2xl border p-6 flex flex-col gap-4"
         style={{ backgroundColor: colors.cardBg, borderColor: `${colors.accent}44` }}
       >
         <div className="flex items-center justify-between">
-          <div>
-            <p style={labelStyle}>Location Management</p>
-            <h2 className="text-lg font-semibold mt-0.5" style={{ color: colors.primary }}>Tambah Lokasi Baru</h2>
-          </div>
+          <h2 className="text-base font-semibold" style={{ color: colors.primary }}>Tambah Lokasi</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-lg transition hover:opacity-70 cursor-pointer"
+            className="w-7 h-7 rounded-full flex items-center justify-center transition hover:opacity-70 cursor-pointer text-lg leading-none"
             style={{ backgroundColor: `${colors.accent}22`, color: colors.foreground }}
             aria-label="Tutup"
           >
@@ -65,69 +59,34 @@ function AddLocationModal({ onClose, onSuccess, colors, isDark }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label style={labelStyle}>Nama Lokasi *</label>
-            <input
-              required
-              value={form.name}
-              onChange={handleChange('name')}
-              placeholder="contoh: Ruang Poli Umum"
-              className="w-full rounded-xl border px-3 py-2.5 text-sm transition"
-              style={inputStyle}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label style={labelStyle}>Status</label>
-            <select
-              value={form.status}
-              onChange={handleChange('status')}
-              className="w-full rounded-xl border px-3 py-2.5 text-sm transition cursor-pointer"
-              style={inputStyle}
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="suspended">Suspended</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label style={labelStyle}>Deskripsi</label>
-            <input
-              value={form.description}
-              onChange={handleChange('description')}
-              placeholder="Deskripsi singkat lokasi (opsional)"
-              className="w-full rounded-xl border px-3 py-2.5 text-sm transition"
-              style={inputStyle}
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label style={labelStyle}>Kode Identifier</label>
-            <input
-              value={form.identifierValue}
-              onChange={handleChange('identifierValue')}
-              placeholder="Kode unik lokasi (opsional)"
-              className="w-full rounded-xl border px-3 py-2.5 text-sm transition"
-              style={inputStyle}
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            required
+            autoFocus
+            value={name}
+            onChange={(e) => { setName(e.target.value); setError(null); }}
+            placeholder="Nama lokasi, contoh: Ruang Poli Umum"
+            className="w-full rounded-xl border px-3 py-2.5 text-sm transition"
+            style={{
+              backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+              borderColor: error ? '#ef4444' : `${colors.accent}55`,
+              color: colors.foreground,
+              outline: 'none',
+            }}
+          />
 
           {error && (
-            <div className="rounded-xl px-4 py-3 text-xs" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>
-              {error}
-            </div>
+            <p className="text-xs" style={{ color: '#ef4444' }}>{error}</p>
           )}
 
-          <div className="flex gap-3 mt-1">
+          <div className="flex gap-2 mt-1">
             <button
               type="submit"
               disabled={loading}
               className="flex-1 rounded-xl py-2.5 text-sm font-semibold transition cursor-pointer hover:opacity-85 active:scale-95 disabled:opacity-50"
               style={{ backgroundColor: colors.primary, color: isDark ? '#0d1210' : '#fff' }}
             >
-              {loading ? 'Menyimpan...' : 'Simpan Lokasi'}
+              {loading ? 'Menyimpan...' : 'Simpan'}
             </button>
             <button
               type="button"
@@ -162,7 +121,8 @@ function LocationsContent() {
     setLoadingList(true);
     try {
       const response = await api.get('/v1/satusehat/location');
-      const bundle = response?.data;
+      // Server membungkus response dengan sendSuccess() → data ada di response.data.data
+      const bundle = response?.data?.data ?? response?.data;
       if (bundle && bundle.entry) {
         setLocations(bundle.entry.map(e => e.resource));
       } else {
@@ -179,8 +139,13 @@ function LocationsContent() {
     fetchLocations();
   }, []);
 
-  const handleModalSuccess = () => {
+  const handleModalSuccess = (newLocation) => {
     setShowModal(false);
+    // Optimistic update: langsung tampilkan lokasi baru tanpa nunggu SATUSEHAT
+    if (newLocation) {
+      setLocations((prev) => [...prev, newLocation]);
+    }
+    // Tetap re-fetch di background untuk sinkronisasi
     fetchLocations();
   };
 
