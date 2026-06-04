@@ -32,38 +32,75 @@ const findExistingLocation = async (locationName, token) => {
  * Jika sudah ada Location dengan nama yang sama, pakai ID yang sudah ada.
  * Jika belum ada, buat baru.
  */
-const createLocation = async (locationName = 'Ruang Poli Umum') => {
+const createLocation = async (params) => {
+  let name, status = 'active', identifierValue, description;
+  let payload;
+
   const token = await getAccessToken();
   const orgId = config.satusehat.orgId;
 
-  // Cek apakah sudah ada
-  const existingId = await findExistingLocation(locationName, token);
-  if (existingId) {
-    console.log(`[Location] Sudah ada (id: ${existingId}), skip create.`);
-    return { locationId: existingId, locationName };
+  if (typeof params === 'string') {
+    name = params;
+    description = params;
+  } else if (params && typeof params === 'object') {
+    if (params.resourceType === 'Location') {
+      // Temukan dan ganti {{Org_id}} placeholder dengan real orgId
+      let jsonString = JSON.stringify(params);
+      jsonString = jsonString.replace(/\{\{Org_id\}\}/g, orgId);
+      payload = JSON.parse(jsonString);
+
+      name = payload.name;
+      delete payload.id; // hapus ID bawaan agar tidak konflik saat POST
+    } else {
+      name = params.name;
+      status = params.status || 'active';
+      identifierValue = params.identifierValue;
+      description = params.description || params.name;
+    }
+  } else {
+    name = 'Ruang Poli Umum';
+    description = 'Ruang Poli Umum';
   }
 
-  const payload = {
-    resourceType: 'Location',
-    status: 'active',
-    name: locationName,
-    description: locationName,
-    mode: 'instance',
-    physicalType: {
-      coding: [
-        {
-          system: 'http://terminology.hl7.org/CodeSystem/location-physical-type',
-          code: 'ro',
-          display: 'Room',
-        },
-      ],
-    },
-    managingOrganization: {
-      reference: `Organization/${orgId}`,
-    },
-  };
+  // Cek apakah sudah ada
+  const existingId = await findExistingLocation(name, token);
+  if (existingId) {
+    console.log(`[Location] Sudah ada (id: ${existingId}), skip create.`);
+    return { locationId: existingId, locationName: name };
+  }
 
-  console.log('[Location] Creating new location:', locationName);
+  if (!payload) {
+    payload = {
+      resourceType: 'Location',
+      status: status,
+      name: name,
+      description: description,
+      mode: 'instance',
+      physicalType: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/location-physical-type',
+            code: 'ro',
+            display: 'Room',
+          },
+        ],
+      },
+      managingOrganization: {
+        reference: `Organization/${orgId}`,
+      },
+    };
+
+    if (identifierValue) {
+      payload.identifier = [
+        {
+          system: `http://sys-ids.kemkes.go.id/location/${orgId}`,
+          value: identifierValue,
+        },
+      ];
+    }
+  }
+
+  console.log('[Location] Creating new location:', name);
 
   let response;
   try {
@@ -78,7 +115,26 @@ const createLocation = async (locationName = 'Ruang Poli Umum') => {
     throw handleSatusehatError(err, 'Location');
   }
 
-  return { locationId: response.data.id, locationName };
+  return { locationId: response.data.id, locationName: name };
 };
 
-module.exports = { createLocation };
+/**
+ * Mengambil daftar Location terdaftar untuk organisasi yang diatur di config.
+ */
+const getLocations = async () => {
+  const token = await getAccessToken();
+  const orgId = config.satusehat.orgId;
+  const url = `${FHIR_BASE}/Location?organization=${orgId}`;
+
+  try {
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (err) {
+    console.error('[Location] Error fetching locations:', JSON.stringify(err.response?.data, null, 2));
+    throw handleSatusehatError(err, 'Location');
+  }
+};
+
+module.exports = { createLocation, getLocations };

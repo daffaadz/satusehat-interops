@@ -5,6 +5,7 @@ const {
   getPatient,
   getPractitioner,
   postLocation,
+  getLocationsList,
   postEncounter,
   debugPractitioner,
   debugSearchPractitioner,
@@ -14,6 +15,7 @@ router.get('/token', getToken);
 router.get('/patient/:nik', getPatient);
 router.get('/practitioner/:nik', getPractitioner);
 router.post('/location', postLocation);
+router.get('/location', getLocationsList);
 router.post('/encounter', postEncounter);
 
 // Debug: coba semua format identifier untuk NIK tertentu

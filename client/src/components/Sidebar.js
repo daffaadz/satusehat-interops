@@ -8,7 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 const navItems = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Registrasi', path: '/dashboard/intake' },
-  { label: 'Booking', path: '/dashboard/404' },
+  { label: 'Lokasi', path: '/dashboard/locations' },
 ];
 
 export default function Sidebar({ userName = 'admin', onLogout }) {

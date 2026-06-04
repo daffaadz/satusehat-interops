@@ -4,7 +4,7 @@ const { debugPractitionerNik, searchPractitionerByName } = require('../services/
 const { registerPatient } = require('../services/registrationService');
 const { getPatientByNik } = require('../services/patientService');
 const { getPractitionerByNik } = require('../services/practitionerService');
-const { createLocation } = require('../services/locationService');
+const { createLocation, getLocations } = require('../services/locationService');
 const { createEncounter } = require('../services/encounterService');
 const { getAccessToken } = require('../services/satusehatAuthService');
 const { sendSuccess, sendError } = require('../utils/response');
@@ -60,9 +60,35 @@ const getPractitioner = async (req, res, next) => {
 // POST /api/v1/satusehat/location — Buat resource Location
 const postLocation = async (req, res, next) => {
   try {
-    const { locationName } = req.body;
-    const data = await createLocation(locationName);
+    let params;
+
+    if (req.body && req.body.resourceType === 'Location') {
+      params = req.body;
+    } else {
+      const { locationName, name, status, description, identifier } = req.body;
+
+      let identifierValue;
+      if (identifier && Array.isArray(identifier) && identifier.length > 0) {
+        identifierValue = identifier[0].value;
+      }
+
+      params = name
+        ? { name, status, identifierValue, description }
+        : locationName;
+    }
+
+    const data = await createLocation(params);
     return sendSuccess(res, data, 'Location berhasil dibuat', 201);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /api/v1/satusehat/location — Ambil daftar Location berdasarkan orgId
+const getLocationsList = async (req, res, next) => {
+  try {
+    const data = await getLocations();
+    return sendSuccess(res, data, 'Daftar Location berhasil diambil');
   } catch (err) {
     next(err);
   }
@@ -126,6 +152,7 @@ module.exports = {
   getPatient,
   getPractitioner,
   postLocation,
+  getLocationsList,
   postEncounter,
   debugPractitioner,
   debugSearchPractitioner,
