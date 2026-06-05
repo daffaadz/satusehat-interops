@@ -23,18 +23,31 @@ const DUMMY_PRACTITIONER_NIK = '1000000000000002';
  */
 const registerPatient = async ({
   patientNik = DUMMY_PATIENT_NIK,
+  patientIhsNumber = null,
+  patientName = null,
   practitionerNik = DUMMY_PRACTITIONER_NIK,
+  practitionerIhsNumber = null,
+  practitionerName = null,
   locationId = null,
   locationName = 'Ruang Poli Umum',
 } = {}) => {
-  // Langkah 1: Cari IHS Pasien (Tetap dari SATUSEHAT karena input user)
-  const patientData = await getPatientByNik(patientNik);
+  // Langkah 1: Cari IHS Pasien (Gunakan data langsung jika ada, misal Pasien Baru)
+  let patientData;
+  if (patientIhsNumber && patientName) {
+    patientData = { ihsNumber: patientIhsNumber, name: patientName };
+  } else {
+    patientData = await getPatientByNik(patientNik);
+  }
 
-  // Langkah 2: Cari IHS Dokter (Prioritaskan DB Lokal)
-  let practitionerData = await PractitionerLocal.findOne({ where: { nik: practitionerNik } });
-  if (!practitionerData) {
-    // Fallback jika tidak ada di DB lokal
-    practitionerData = await getPractitionerByNik(practitionerNik);
+  // Langkah 2: Cari IHS Dokter (Gunakan data langsung jika ada)
+  let practitionerData;
+  if (practitionerIhsNumber && practitionerName) {
+    practitionerData = { ihsNumber: practitionerIhsNumber, name: practitionerName };
+  } else {
+    practitionerData = await PractitionerLocal.findOne({ where: { nik: practitionerNik } });
+    if (!practitionerData) {
+      practitionerData = await getPractitionerByNik(practitionerNik);
+    }
   }
 
   // Langkah 3: Cari Location (Prioritaskan DB Lokal)

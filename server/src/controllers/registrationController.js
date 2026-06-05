@@ -14,12 +14,25 @@ const register = async (req, res, next) => {
   try {
     const {
       patientNik,
+      patientIhsNumber,
+      patientName,
       practitionerNik,
+      practitionerIhsNumber,
+      practitionerName,
       locationId,
       locationName,
     } = req.body;
 
-    const result = await registerPatient({ patientNik, practitionerNik, locationId, locationName });
+    const result = await registerPatient({
+      patientNik,
+      patientIhsNumber,
+      patientName,
+      practitionerNik,
+      practitionerIhsNumber,
+      practitionerName,
+      locationId,
+      locationName
+    });
     return sendSuccess(res, result, 'Pendaftaran pasien berhasil', 201);
   } catch (err) {
     next(err);

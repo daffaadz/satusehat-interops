@@ -8,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 const navItems = [
   { label: 'Dashboard', path: '/dashboard' },
   { label: 'Registrasi', path: '/dashboard/intake' },
+  { label: 'Riwayat Encounter', path: '/dashboard/encounter' },
   { label: 'Praktisi', path: '/dashboard/practitioner' },
   { label: 'Lokasi', path: '/dashboard/locations' },
 ];
