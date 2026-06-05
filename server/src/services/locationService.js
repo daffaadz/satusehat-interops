@@ -2,6 +2,7 @@ const axios = require('axios');
 const config = require('../config');
 const { getAccessToken } = require('./satusehatAuthService');
 const { handleSatusehatError } = require('../utils/satusehatError');
+const Location = require('../models/Location');
 
 const FHIR_BASE = `${config.satusehat.baseUrl}/fhir-r4/v1`;
 
@@ -110,6 +111,12 @@ const createLocation = async (params) => {
         'Content-Type': 'application/json',
       },
     });
+
+    // Simpan ke database lokal
+    await Location.create({
+      locationId: response.data.id,
+      name: name,
+    });
   } catch (err) {
     console.error('[Location] Error response:', JSON.stringify(err.response?.data, null, 2));
     throw handleSatusehatError(err, 'Location');
@@ -137,4 +144,34 @@ const getLocations = async () => {
   }
 };
 
-module.exports = { createLocation, getLocations };
+/**
+ * Sinkronisasi semua Location dari SATUSEHAT ke database lokal.
+ * Berguna saat baru pertama kali setup atau ada Location yang dibuat di luar aplikasi ini.
+ */
+const syncLocationsToLocalDB = async () => {
+  const satusehatData = await getLocations();
+  const entries = satusehatData?.entry || [];
+  
+  let syncedCount = 0;
+  for (const entry of entries) {
+    const loc = entry.resource;
+    if (loc && loc.id && loc.name) {
+      const [record, created] = await Location.findOrCreate({
+        where: { locationId: loc.id },
+        defaults: { name: loc.name },
+      });
+      
+      // Jika sudah ada tapi namanya beda di SATUSEHAT, kita update
+      if (!created && record.name !== loc.name) {
+        await record.update({ name: loc.name });
+      }
+      
+      syncedCount++;
+    }
+  }
+  
+  console.log(`[Location] Sinkronisasi selesai. Total tersinkron: ${syncedCount}`);
+  return syncedCount;
+};
+
+module.exports = { createLocation, getLocations, syncLocationsToLocalDB };

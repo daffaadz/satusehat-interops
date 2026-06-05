@@ -4,7 +4,7 @@ const { debugPractitionerNik, searchPractitionerByName } = require('../services/
 const { registerPatient } = require('../services/registrationService');
 const { getPatientByNik } = require('../services/patientService');
 const { getPractitionerByNik } = require('../services/practitionerService');
-const { createLocation, getLocations } = require('../services/locationService');
+const { createLocation, getLocations, syncLocationsToLocalDB } = require('../services/locationService');
 const { createEncounter } = require('../services/encounterService');
 const { getAccessToken } = require('../services/satusehatAuthService');
 const { sendSuccess, sendError } = require('../utils/response');
@@ -88,6 +88,16 @@ const getLocationsList = async (req, res, next) => {
   }
 };
 
+// POST /api/v1/satusehat/location/sync — Sinkronisasi manual lokasi dari SATUSEHAT ke database lokal
+const syncLocationsHandler = async (req, res, next) => {
+  try {
+    const count = await syncLocationsToLocalDB();
+    return sendSuccess(res, { syncedCount: count }, `Berhasil menyinkronkan ${count} lokasi ke database lokal`);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // POST /api/v1/satusehat/encounter — Buat resource Encounter
 const postEncounter = async (req, res, next) => {
   try {
@@ -149,4 +159,5 @@ module.exports = {
   postEncounter,
   debugPractitioner,
   debugSearchPractitioner,
+  syncLocationsHandler,
 };

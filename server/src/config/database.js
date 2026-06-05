@@ -34,9 +34,7 @@ const connectDB = async () => {
     
     // Run seeders
     const seedPractitioners = require('../seeders/practitionerSeeder');
-    const seedLocations = require('../seeders/locationSeeder');
     await seedPractitioners();
-    await seedLocations();
 
     console.log(`[DB] SQLite siap: ${DB_PATH}`);
   } catch (err) {

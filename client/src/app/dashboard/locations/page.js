@@ -25,7 +25,7 @@ function AddLocationModal({ onClose, onSuccess, colors, isDark }) {
       });
       const newLocationId = result?.data?.data?.locationId;
       onSuccess({
-        id: newLocationId || `temp-${Date.now()}`,
+        locationId: newLocationId || `temp-${Date.now()}`,
         name: name.trim(),
         status: 'active',
         identifier: [],
@@ -116,18 +116,27 @@ function LocationsContent() {
   const [locations, setLocations] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncLocations = async () => {
+    setIsSyncing(true);
+    try {
+      await api.post('/v1/satusehat/location/sync');
+      alert('Sinkronisasi database lokal berhasil!');
+      await fetchLocations();
+    } catch (err) {
+      alert('Gagal menyinkronkan lokasi: ' + (err?.payload?.message || err?.message));
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const fetchLocations = async () => {
     setLoadingList(true);
     try {
-      const response = await api.get('/v1/satusehat/location');
-      // Server membungkus response dengan sendSuccess() → data ada di response.data.data
-      const bundle = response?.data?.data ?? response?.data;
-      if (bundle && bundle.entry) {
-        setLocations(bundle.entry.map(e => e.resource));
-      } else {
-        setLocations([]);
-      }
+      const response = await api.get('/v1/locations');
+      const data = response?.data ?? [];
+      setLocations(data);
     } catch (err) {
       console.error("Gagal mengambil daftar lokasi:", err);
     } finally {
@@ -189,17 +198,32 @@ function LocationsContent() {
                   {locations.length} lokasi terdeteksi untuk organisasi Anda
                 </p>
               </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer hover:opacity-85 active:scale-95"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: isDark ? '#0d1210' : '#fff',
-                }}
-              >
-                <span className="text-base leading-none">+</span>
-                Tambah Lokasi
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSyncLocations}
+                  disabled={isSyncing || loadingList}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer hover:opacity-85 active:scale-95 disabled:opacity-50"
+                  style={{
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                    color: colors.foreground,
+                    border: `1px solid ${colors.accent}44`
+                  }}
+                >
+                  <span className={isSyncing ? "animate-spin" : ""}>🔄</span>
+                  {isSyncing ? 'Menyinkronkan...' : 'Refresh'}
+                </button>
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition cursor-pointer hover:opacity-85 active:scale-95"
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: isDark ? '#0d1210' : '#fff',
+                  }}
+                >
+                  <span className="text-base leading-none">+</span>
+                  Tambah Lokasi
+                </button>
+              </div>
             </div>
 
             {/* Loading */}
@@ -244,9 +268,11 @@ function LocationsContent() {
                       const badge = statusBadge(status);
                       const isLast = idx === locations.length - 1;
 
+                      const idLoc = loc.locationId || loc.id;
+
                       return (
                         <tr
-                          key={loc.id}
+                          key={idLoc}
                           className="transition hover:bg-white/5"
                           style={!isLast ? { borderBottom: `1px solid ${colors.accent}22` } : {}}
                         >
@@ -275,15 +301,15 @@ function LocationsContent() {
                             <div className="flex items-center gap-2 min-w-0">
                               <span
                                 className="font-mono text-[11px] px-1.5 py-0.5 rounded truncate min-w-0 flex-1"
-                                title={loc.id}
+                                title={idLoc}
                                 style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', color: colors.foreground }}
                               >
-                                {loc.id}
+                                {idLoc}
                               </span>
                               <button
                                 onClick={() => {
-                                  navigator.clipboard.writeText(loc.id);
-                                  alert('ID Lokasi disalin: ' + loc.id);
+                                  navigator.clipboard.writeText(idLoc);
+                                  alert('ID Lokasi disalin: ' + idLoc);
                                 }}
                                 title="Salin ID"
                                 className="shrink-0 text-xs hover:opacity-70 transition cursor-pointer"

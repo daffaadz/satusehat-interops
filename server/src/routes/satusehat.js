@@ -8,12 +8,14 @@ const {
   postEncounter,
   debugPractitioner,
   debugSearchPractitioner,
+  syncLocationsHandler,
 } = require('../controllers/registrationController');
 
 router.get('/token', getToken);
 router.get('/patient/:nik', getPatient);
 // getPractitioner dihapus, pakai DB lokal (GET /api/v1/practitioners/:nik)
 router.post('/location', postLocation);
+router.post('/location/sync', syncLocationsHandler);
 router.get('/location', getLocationsList);
 router.post('/encounter', postEncounter);
 
