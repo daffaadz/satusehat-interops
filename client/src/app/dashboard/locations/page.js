@@ -1,9 +1,9 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import AuthGuard from '../../../components/AuthGuard';
 import Sidebar from '../../../components/Sidebar';
+import Popup from '../../../components/Popup';
 import { useAuth } from '../../../hooks/useAuth';
 import { useTheme } from '../../../context/ThemeContext';
 import { api } from '../../../lib/api';
@@ -116,6 +116,7 @@ function LocationsContent() {
   const [locations, setLocations] = useState([]);
   const [loadingList, setLoadingList] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [popup, setPopup] = useState(null);
 
   const fetchLocations = async () => {
     setLoadingList(true);
@@ -144,6 +145,12 @@ function LocationsContent() {
     // Optimistic update: langsung tampilkan lokasi baru tanpa nunggu SATUSEHAT
     if (newLocation) {
       setLocations((prev) => [...prev, newLocation]);
+      setPopup({
+        type: 'success',
+        title: 'Lokasi Berhasil Ditambahkan',
+        message: `Lokasi "${newLocation.name}" dengan ID ${newLocation.id} berhasil terdaftar di SATUSEHAT dan tersimpan di database lokal.`,
+        confirmLabel: 'Tutup'
+      });
     }
     // Tetap re-fetch di background untuk sinkronisasi
     fetchLocations();
@@ -309,6 +316,16 @@ function LocationsContent() {
           onSuccess={handleModalSuccess}
           colors={colors}
           isDark={isDark}
+        />
+      )}
+
+      {popup && (
+        <Popup
+          type={popup.type}
+          title={popup.title}
+          message={popup.message}
+          confirmLabel={popup.confirmLabel}
+          onClose={() => setPopup(null)}
         />
       )}
     </div>

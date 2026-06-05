@@ -212,11 +212,23 @@ function IntakeContent() {
       };
 
       const response = await api.post('/v1/register', payload);
-      setResult(response.data.data || response.data);
+      const resData = response.data || response;
+      setResult(resData);
+
+      const timestampStr = resData?.encounter?.timestamp
+        ? new Date(resData.encounter.timestamp).toLocaleString('id-ID', {
+            dateStyle: 'long',
+            timeStyle: 'medium'
+          })
+        : new Date().toLocaleString('id-ID', {
+            dateStyle: 'long',
+            timeStyle: 'medium'
+          });
+
       setPopup({
         type: 'success',
         title: 'Registrasi Berhasil',
-        message: 'Encounter berhasil dibuat di SATUSEHAT dan tersimpan di database lokal.',
+        message: `Encounter berhasil dibuat di SATUSEHAT pada ${timestampStr} dan tersimpan di database lokal.`,
         confirmLabel: 'Tutup',
       });
     } catch (error) {
