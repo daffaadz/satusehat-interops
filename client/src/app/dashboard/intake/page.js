@@ -82,11 +82,13 @@ function IntakeContent() {
           setPractitioners(pracRes.data);
         }
 
-        const locRes = await api.get('/v1/satusehat/location');
-        const bundle = locRes?.data;
-        if (bundle?.entry) {
-          setLocations(bundle.entry.map(e => e.resource));
-        }
+        const locRes = await api.get('/v1/locations');
+        const list = locRes?.data ?? [];
+        setLocations(list.map(l => ({
+          id: l.locationId,
+          name: l.name,
+          description: `ID: ${l.locationId}`
+        })));
       } catch (err) {
         console.error("Gagal memuat data pendukung:", err);
       } finally {
