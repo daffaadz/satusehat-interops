@@ -10,6 +10,7 @@ const navItems = [
   { label: 'Registrasi', path: '/dashboard/intake' },
   { label: 'Praktisi', path: '/dashboard/practitioner' },
   { label: 'Lokasi', path: '/dashboard/locations' },
+  { label: 'Kunjungan', path: '/dashboard/encounter'}
 ];
 
 export default function Sidebar({ userName = 'admin', onLogout }) {

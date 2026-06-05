@@ -215,7 +215,7 @@ function PractitionerContent() {
               }}
             >
               <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
-                Cari Praktisi by NIK
+                Cari Praktisi by NIK 
               </p>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                 <div className="flex-1">
