@@ -1,0 +1,15 @@
+{
+  "name": "t1-intero-2-root",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:client": "npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "pnpm:client": "pnpm --filter client dev",
+    "pnpm:server": "pnpm --filter server dev"
+  }
+}

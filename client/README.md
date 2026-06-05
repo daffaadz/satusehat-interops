@@ -13,23 +13,30 @@ Folder `client/` berisi antarmuka pengguna web yang akan berkomunikasi dengan ba
 Catatan: untuk instruksi `clone` dan setup cepat (server + client), lihat `../README.md`.
 
 ## Setup dan Jalan
-1. Buka terminal di folder `client`:
+Proyek ini sekarang dikonfigurasi menggunakan monorepo workspace. Sangat disarankan untuk menginstal dependensi dari root folder secara terpadu.
+
+### Cara 1: Menggunakan Perintah dari Root Folder (Sangat Direkomendasikan)
+1. Jalankan instalasi dari root folder:
    ```bash
-   cd client
+   pnpm install # atau npm install
    ```
-2. Install dependensi:
+2. Jalankan frontend dari root folder:
    ```bash
-   npm install
-   # atau
-   pnpm install
+   pnpm pnpm:client # atau npm run dev:client
    ```
-3. Jalankan aplikasi frontend:
+
+### Cara 2: Dari Direktori `client/`
+Jika Anda berada di dalam folder `client`:
+1. Instal dependensi:
    ```bash
-   npm run dev
-   # atau
-   pnpm dev
+   pnpm install # atau npm install
    ```
-4. Buka `http://localhost:3000` di browser.
+2. Jalankan aplikasi frontend:
+   ```bash
+   pnpm dev # atau npm run dev
+   ```
+
+3. Buka `http://localhost:3000` di browser.
 
 > Pastikan backend sudah berjalan terlebih dahulu di `http://localhost:5000`.
 

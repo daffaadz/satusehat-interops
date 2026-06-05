@@ -14,36 +14,45 @@ Folder `server/` berisi layanan API yang menghubungkan frontend dengan SATUSEHAT
 
 Catatan: untuk instruksi `clone` dan setup cepat (server + client), lihat `../README.md`.
 
-## Setup
-1. Buka terminal di folder `server`:
+## Setup & Jalankan Server
+Proyek ini sekarang dikonfigurasi menggunakan monorepo workspace. Sangat disarankan untuk menginstal dependensi dari root folder secara terpadu.
+
+### Cara 1: Menggunakan Perintah dari Root Folder (Sangat Direkomendasikan)
+1. Jalankan instalasi dari root folder:
    ```bash
-   cd server
+   pnpm install # atau npm install
    ```
-2. Install dependensi:
+2. Setup file `.env` di folder `server/` (lihat petunjuk pengisian di bawah).
+3. Jalankan backend dari root folder:
    ```bash
-   npm install
-   # atau
-   pnpm install
-   ```
-3. Buat file environment:
-   ```bash
-   cp .env.example .env
-   ```
-4. Isi `.env` dengan kredensial SATUSEHAT:
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   SATUSEHAT_BASE_URL=https://api-satusehat-stg.dto.kemkes.go.id
-   SATUSEHAT_ORG_ID=YOUR_ORGANIZATION_ID
-   SATUSEHAT_CLIENT_ID=YOUR_CLIENT_ID
-   SATUSEHAT_CLIENT_SECRET=YOUR_CLIENT_SECRET
+   pnpm pnpm:server # atau npm run dev:server
    ```
 
-## Jalankan server
+### Cara 2: Dari Direktori `server/`
+Jika Anda berada di dalam folder `server`:
+1. Instal dependensi:
+   ```bash
+   pnpm install # atau npm install
+   ```
+2. Setup file `.env` (lihat petunjuk pengisian di bawah).
+3. Jalankan server backend:
+   ```bash
+   pnpm dev # atau npm run dev
+   ```
+
+### Setup File Environment (`server/.env`)
+Buat file `.env` baru dari `.env.example` di folder `server/`:
 ```bash
-npm run dev
-# atau
-pnpm dev
+cp .env.example .env
+```
+Isi dengan kredensial SATUSEHAT:
+```env
+PORT=5000
+NODE_ENV=development
+SATUSEHAT_BASE_URL=https://api-satusehat-stg.dto.kemkes.go.id
+SATUSEHAT_ORG_ID=YOUR_ORGANIZATION_ID
+SATUSEHAT_CLIENT_ID=YOUR_CLIENT_ID
+SATUSEHAT_CLIENT_SECRET=YOUR_CLIENT_SECRET
 ```
 
 Server akan berjalan di `http://localhost:5000`.

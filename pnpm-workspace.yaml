@@ -1,0 +1,8 @@
+packages:
+  - 'client'
+  - 'server'
+allowBuilds:
+  '@scarf/scarf': true
+  sharp: true
+  sqlite3: true
+  unrs-resolver: true

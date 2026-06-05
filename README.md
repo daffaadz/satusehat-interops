@@ -70,58 +70,48 @@ git clone https://github.com/daffaadz/satusehat-interops.git
 cd satusehat-interops
 ```
 
-### 2. Setup Server (Backend)
-Backend berfungsi sebagai *middleware* untuk berkomunikasi dengan SATUSEHAT API secara aman tanpa mengekspos rahasia dari sisi *client*.
+### 2. Instalasi Dependensi (Workspace Root)
+Proyek ini sekarang menggunakan monorepo workspace yang memungkinkan instalasi semua dependensi sekaligus dari root folder.
 
-1. Pindah ke direktori `server`:
-   ```bash
-   cd server
-   ```
-2. Instal dependensi:
-   ```bash
-   npm install
-   # atau jika menggunakan pnpm:
-   pnpm install
-   ```
-3. Buat file konfigurasi environment (`.env`) berdasarkan kredensial SATUSEHAT Anda:
-   ```bash
-   cp .env.example .env # atau buat file .env baru secara manual
-   ```
-   **Isi dari `.env` (berdasarkan konfigurasi environment):**
-   ```env
-   PORT=5000
-   NODE_ENV=development
-   SATUSEHAT_BASE_URL=https://api-satusehat-stg.dto.kemkes.go.id
-   SATUSEHAT_ORG_ID=YOUR_ORGANIZATION_ID
-   SATUSEHAT_CLIENT_ID=YOUR_CLIENT_ID
-   SATUSEHAT_CLIENT_SECRET=YOUR_CLIENT_SECRET
-   ```
-4. Jalankan server mode pengembangan:
-   ```bash
-   npm run dev
-   # Server akan berjalan di http://localhost:5000
-   ```
+**Menggunakan pnpm (Direkomendasikan):**
+```bash
+pnpm install
+```
+*Catatan: pnpm secara otomatis akan mengonfigurasi workspace dan mengotorisasi skrip build dependensi.*
 
-### 3. Setup Client (Frontend)
-Frontend menyediakan antarmuka pengguna sistem.
+**Menggunakan npm:**
+```bash
+npm install
+```
 
-1. Buka terminal baru dan pindah ke direktori `client`:
-   ```bash
-   cd client
-   ```
-2. Instal dependensi:
-   ```bash
-   npm install
-   # atau
-   pnpm install
-   ```
-3. Jalankan aplikasi web:
-   ```bash
-   npm run dev
-   # atau
-   pnpm dev
-   ```
-4. Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
+### 3. Setup Konfigurasi Environment (Backend)
+Salin contoh konfigurasi environment di folder `server` dan buat file `.env` baru:
+```bash
+cp server/.env.example server/.env
+```
+
+**Isi dari `server/.env` (sesuaikan dengan kredensial Portal SATUSEHAT Anda):**
+```env
+PORT=5000
+NODE_ENV=development
+SATUSEHAT_BASE_URL=https://api-satusehat-stg.dto.kemkes.go.id
+SATUSEHAT_ORG_ID=YOUR_ORGANIZATION_ID
+SATUSEHAT_CLIENT_ID=YOUR_CLIENT_ID
+SATUSEHAT_CLIENT_SECRET=YOUR_CLIENT_SECRET
+```
+
+### 4. Menjalankan Aplikasi dalam Mode Pengembangan
+Anda dapat menjalankan backend dan frontend langsung dari root folder menggunakan script workspace berikut:
+
+**Menggunakan pnpm:**
+*   Menjalankan Frontend (Next.js): `pnpm pnpm:client`
+*   Menjalankan Backend (Express): `pnpm pnpm:server`
+
+**Menggunakan npm:**
+*   Menjalankan Frontend (Next.js): `npm run dev:client`
+*   Menjalankan Backend (Express): `npm run dev:server`
+
+Buka [http://localhost:3000](http://localhost:3000) untuk mengakses frontend dan [http://localhost:5000](http://localhost:5000) untuk backend.
 
 ## 🔌 Endpoint Backend Ringkas
 

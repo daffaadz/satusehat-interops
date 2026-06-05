@@ -5,3 +5,11 @@ FE_PROGRESS.md
 NEXT_ITERATION_RECOMMENDATION.md
 PLANNING.md
 SETUP_GUIDE.md
+road.md
+cleanup.md
+
+# Root node_modules (if any, but usually none)
+node_modules/
+
+# pnpm debug logs
+.pnpm-debug.log
