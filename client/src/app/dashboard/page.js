@@ -39,22 +39,22 @@ function DashboardContent() {
   const displayRole = user?.role || 'admin';
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar userName={user?.username || 'admin'} onLogout={handleLogout} />
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header
-          className="sticky top-0 z-20 border-b border-accent/30 bg-background px-6 py-5 lg:px-10"
+          className="sticky top-0 z-20 border-b border-accent/30 bg-background px-6 py-4 lg:px-10"
         >
-          <p className="text-xs font-medium uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
+          <p className="text-[10px] font-medium uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
             Dashboard Admin
           </p>
-          <h1 className="mt-1 text-2xl font-semibold sm:text-3xl lg:text-4xl" style={{ color: colors.primary }}>
+          <h1 className="mt-1 text-xl font-semibold sm:text-2xl lg:text-3xl" style={{ color: colors.primary }}>
             Halo, {displayName}
           </h1>
         </header>
 
-        <main className="flex-1 px-6 py-6 lg:px-10 lg:py-8">
+        <main className="flex-1 px-6 py-5 lg:px-10 lg:py-6 overflow-y-auto">
           <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
             <StatCard label="Status Sistem" value="Aktif" colors={colors} />
             <StatCard label="Pengguna Terkini" value={displayRole} colors={colors} />

@@ -87,10 +87,10 @@ function EncounterContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex h-screen bg-background text-foreground overflow-hidden">
       <Sidebar userName={user?.username || 'admin'} onLogout={handleLogout} />
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="sticky top-0 z-20 border-b border-accent/30 bg-background px-6 py-4 lg:px-10">
           <p className="text-[10px] font-medium uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
             Encounter Logs
@@ -100,7 +100,7 @@ function EncounterContent() {
           </h1>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-6 py-6 lg:px-10 lg:py-8 space-y-6">
+        <main className="flex-1 px-6 py-5 lg:px-10 lg:py-6 overflow-y-auto space-y-6">
           
           {/* Search Filter Bar */}
           <form 
